@@ -6,6 +6,7 @@ import BookIcon from "@mui/icons-material/Book";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import QrCode2Icon from "@mui/icons-material/QrCode2";
 import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -68,6 +69,20 @@ const QuickAction = styled(Box)(({ theme }) => ({
     transform: "translateY(-2px)",
     borderColor: alpha("#7c4dff", 0.45),
     backgroundColor: alpha("#7c4dff", 0.1),
+  },
+}));
+
+const ScanPanel = styled(Box)(({ theme }) => ({
+  borderRadius: 18,
+  padding: theme.spacing(1.5),
+  background:
+    "linear-gradient(155deg, rgba(124,77,255,0.22), rgba(68,138,255,0.12) 56%, rgba(255,255,255,0.04))",
+  border: "1px solid rgba(124,77,255,0.4)",
+  display: "grid",
+  gap: theme.spacing(1.5),
+  [theme.breakpoints.up("sm")]: {
+    gridTemplateColumns: "auto 1fr",
+    alignItems: "center",
   },
 }));
 
@@ -191,96 +206,103 @@ export default function Dashboard() {
       </SectionCard>
 
       <SectionCard elevation={0}>
-        <Typography sx={{ px: 1, pb: 1, color: "#cfcfcf", fontWeight: 600 }}>
-          Scan to Access
-        </Typography>
-        <Box
-          sx={{
-            borderRadius: 14,
-            px: 2,
-            py: 2,
-            background:
-              "linear-gradient(160deg, rgba(124,77,255,0.14), rgba(68,138,255,0.08))",
-            border: "1px solid rgba(124,77,255,0.35)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            gap: 1.5,
-          }}
-        >
-          <Typography sx={{ color: "#dbdbdb", fontSize: 12 }}>
-            Scan this code from your phone to open Tools quickly.
-          </Typography>
-
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Box
-              sx={{
-                p: 1.25,
-                borderRadius: 3,
-                bgcolor: "#fff",
-                display: "flex",
-                border: "4px solid rgba(124,77,255,0.14)",
-                boxShadow: "0 12px 24px rgba(0,0,0,0.32)",
-              }}
-            >
-              <QRCodeSVG
-                value={qrUrl}
-                size={170}
-                fgColor="#111111"
-                bgColor="#ffffff"
-                level="M"
-                includeMargin
-              />
-            </Box>
-          </Box>
-
+        <ScanPanel>
           <Box
             sx={{
-              px: 1.5,
-              py: 1,
-              borderRadius: 2,
-              bgcolor: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 1,
+              width: "fit-content",
+              mx: "auto",
+              p: 1,
+              borderRadius: '6px',
+              bgcolor: "#ffffff",
+              border: "2px solid rgba(255,255,255,0.92)",
+              overflow: "hidden",
+              lineHeight: 0,
+              padding: '6px',
+              boxShadow: "0 16px 34px rgba(0,0,0,0.35)",
             }}
           >
-            <Typography
+            <QRCodeSVG
+              value={qrUrl}
+              size={120}
+              fgColor="#111111"
+              bgColor="#ffffff"
+              level="Q"
+            />
+          </Box>
+
+          <Box sx={{ minWidth: 0 }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+              <QrCode2Icon sx={{ fontSize: 18, color: "#d1c4e9" }} />
+              <Typography sx={{ color: "#f3f3f3", fontWeight: 700, fontSize: 15 }}>
+                Scan to Access
+              </Typography>
+              <Chip
+                size="small"
+                label="Phone Ready"
+                sx={{
+                  height: 22,
+                  bgcolor: "rgba(255,255,255,0.14)",
+                  color: "#e6e6e6",
+                  fontSize: 11,
+                }}
+              />
+            </Stack>
+
+            <Typography sx={{ color: "#dadada", fontSize: 12, mb: 1.2 }}>
+              Open this app on your mobile camera and continue instantly.
+            </Typography>
+
+            <Box
               sx={{
-                color: "#b6b6b6",
-                fontSize: 12,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                px: 1.25,
+                py: 1,
+                borderRadius: 2.5,
+                bgcolor: "rgba(10,10,10,0.22)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                mb: 1,
               }}
             >
-              {qrUrl}
-            </Typography>
+              <Typography
+                sx={{
+                  color: "#d0d0d0",
+                  fontSize: 11.5,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {qrUrl}
+              </Typography>
+            </Box>
+
             <Button
+              fullWidth
               size="small"
               variant="contained"
               startIcon={<ContentCopyIcon sx={{ fontSize: 14 }} />}
               onClick={async () => {
-                await navigator.clipboard.writeText(qrUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1200);
+                try {
+                  await navigator.clipboard.writeText(qrUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 1200);
+                } catch {
+                  setCopied(false);
+                }
               }}
               sx={{
-                borderRadius: 2,
+                borderRadius: 2.5,
                 textTransform: "none",
-                minWidth: 92,
+                py: 0.7,
                 bgcolor: copied ? "#2e7d32" : "#7c4dff",
                 "&:hover": {
                   bgcolor: copied ? "#2e7d32" : "#6f3dff",
                 },
               }}
             >
-              {copied ? "Copied" : "Copy"}
+              {copied ? "Link Copied" : "Copy Link"}
             </Button>
           </Box>
-        </Box>
+        </ScanPanel>
       </SectionCard>
     </Root>
   );

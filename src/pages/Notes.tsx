@@ -137,6 +137,8 @@ export default function Notes() {
 
   const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
     e.stopPropagation();
+    const confirmed = window.confirm("Close this tab?");
+    if (!confirmed) return;
     closeTab(tabId);
   };
 

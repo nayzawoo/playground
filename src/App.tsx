@@ -3,6 +3,8 @@ import PWABadge from "./PWABadge.tsx";
 import {
   AppBar,
   Box,
+  BottomNavigation,
+  BottomNavigationAction,
   CssBaseline,
   Divider,
   Drawer,
@@ -12,6 +14,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Paper,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -29,7 +32,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import NoteIcon from "@mui/icons-material/Note";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import BookIcon from "@mui/icons-material/Book";
 
 import Dashboard from "./pages/Dashboard";
@@ -39,8 +41,9 @@ import Dhamma from "./pages/Dhamma";
 
 /* ── Constants ── */
 
-const DRAWER_WIDTH = 260;
-const COLLAPSED_WIDTH = 72;
+const DRAWER_WIDTH = 280;
+const RAIL_WIDTH = 96;
+const BOTTOM_NAV_HEIGHT = 74;
 const BORDER = "1px solid rgba(255,255,255,0.06)";
 
 /* ── Theme ── */
@@ -52,7 +55,7 @@ const darkTheme = createTheme({
     background: { default: "#0f1117", paper: "#161923" },
   },
   typography: { fontFamily: "'Inter', 'Roboto', sans-serif" },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 16 },
 });
 
 /* ── Menu Config ── */
@@ -72,7 +75,9 @@ const menuItems = [
 
 const LayoutRoot = styled(Box)({
   display: "flex",
-  minHeight: "100vh",
+  minHeight: "100dvh",
+  background:
+    "radial-gradient(circle at 5% 0%, rgba(124,77,255,0.12), transparent 34%), #0f1117",
 });
 
 const BrandTitle = styled(Typography)({
@@ -87,7 +92,7 @@ const SidebarDivider = styled(Divider)({
 });
 
 const NavList = styled(List)({
-  marginTop: 8,
+  marginTop: 6,
   paddingLeft: 8,
   paddingRight: 8,
 });
@@ -98,8 +103,8 @@ const drawerPaperBase = {
 } as const;
 
 const GlassAppBar = styled(AppBar)({
-  backgroundColor: "rgba(15, 17, 23, 0.8)",
-  backdropFilter: "blur(12px)",
+  backgroundColor: "rgba(15, 17, 23, 0.72)",
+  backdropFilter: "blur(14px)",
   borderBottom: BORDER,
 });
 
@@ -107,11 +112,39 @@ const MainContent = styled("main")(({ theme }) => ({
   flexGrow: 1,
   display: "flex",
   flexDirection: "column",
-  [theme.breakpoints.down("md")]: { width: "100%" },
+  minWidth: 0,
+  width: "100%",
+  [theme.breakpoints.up("md")]: {
+    maxWidth: "100%",
+  },
+}));
+
+const RouteViewport = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  display: "flex",
+  flexDirection: "column",
+  minHeight: 0,
+  paddingBottom: `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
+  [theme.breakpoints.up("md")]: {
+    paddingBottom: 0,
+  },
+}));
+
+const MobileBottomBar = styled(Paper)(({ theme }) => ({
+  position: "fixed",
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: theme.zIndex.appBar,
+  borderTop: BORDER,
+  backgroundColor: "rgba(22, 25, 35, 0.95)",
+  backdropFilter: "blur(12px)",
+  paddingBottom: "env(safe-area-inset-bottom, 0px)",
 }));
 
 const PageTitle = styled(Typography)({
   fontWeight: 600,
+  letterSpacing: 0.2,
 });
 
 /* ── Layout ── */
@@ -119,7 +152,7 @@ const PageTitle = styled(Typography)({
 function AppLayout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [open, setOpen] = useState(!isMobile);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -129,10 +162,8 @@ function AppLayout() {
 
   const handleNavClick = (path: string) => {
     navigate(path);
-    if (isMobile) setOpen(false);
+    setOpen(false);
   };
-
-  const showLabel = open || isMobile;
 
   const drawerContent = (
     <>
@@ -140,17 +171,15 @@ function AppLayout() {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: open ? "space-between" : "center",
-          px: open ? 2 : 1,
+          justifyContent: "space-between",
+          px: 2,
         }}
       >
-        {open && (
-          <BrandTitle variant="h6" noWrap>
-            Tools
-          </BrandTitle>
-        )}
-        <IconButton onClick={() => setOpen(!open)} sx={{ color: "grey.400" }}>
-          {open ? <ChevronLeftIcon /> : <MenuIcon />}
+        <BrandTitle variant="h6" noWrap>
+          Tools
+        </BrandTitle>
+        <IconButton onClick={() => setOpen(false)} sx={{ color: "grey.400" }}>
+          <MenuIcon />
         </IconButton>
       </Toolbar>
 
@@ -165,8 +194,8 @@ function AppLayout() {
                 onClick={() => handleNavClick(item.path)}
                 sx={{
                   borderRadius: 2,
-                  minHeight: 48,
-                  justifyContent: showLabel ? "initial" : "center",
+                  minHeight: 50,
+                  justifyContent: "initial",
                   px: 2,
                   bgcolor: isSelected ? "rgba(124,77,255,0.12)" : "transparent",
                   color: isSelected ? "primary.main" : "grey.400",
@@ -180,22 +209,20 @@ function AppLayout() {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: showLabel ? 2 : "auto",
+                    mr: 2,
                     justifyContent: "center",
                     color: isSelected ? "primary.main" : "grey.500",
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
-                {showLabel && (
-                  <ListItemText
-                    primary={item.text}
-                    primaryTypographyProps={{
-                      fontWeight: isSelected ? 600 : 400,
-                      fontSize: 14,
-                    }}
-                  />
-                )}
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontWeight: isSelected ? 600 : 400,
+                    fontSize: 14,
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           );
@@ -206,7 +233,75 @@ function AppLayout() {
 
   return (
     <LayoutRoot>
-      {isMobile ? (
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            width: RAIL_WIDTH,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: RAIL_WIDTH,
+              overflowX: "hidden",
+              ...drawerPaperBase,
+            },
+          }}
+        >
+          <Toolbar
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <BrandTitle variant="subtitle1">Tools</BrandTitle>
+          </Toolbar>
+          <SidebarDivider />
+          <NavList>
+            {menuItems.map((item) => {
+              const isSelected = currentPath === item.path;
+              return (
+                <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+                  <ListItemButton
+                    onClick={() => handleNavClick(item.path)}
+                    sx={{
+                      borderRadius: 2,
+                      minHeight: 56,
+                      px: 1,
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5,
+                      bgcolor: isSelected
+                        ? "rgba(124,77,255,0.16)"
+                        : "transparent",
+                      color: isSelected ? "primary.main" : "grey.400",
+                      "&:hover": {
+                        bgcolor: isSelected
+                          ? "rgba(124,77,255,0.24)"
+                          : "rgba(255,255,255,0.04)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        color: isSelected ? "primary.main" : "grey.500",
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <Typography sx={{ fontSize: 11, lineHeight: 1.1 }}>
+                      {item.text}
+                    </Typography>
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </NavList>
+        </Drawer>
+      )}
+
+      {isMobile && (
         <Drawer
           variant="temporary"
           open={open}
@@ -218,29 +313,11 @@ function AppLayout() {
         >
           {drawerContent}
         </Drawer>
-      ) : (
-        <Drawer
-          variant="permanent"
-          open={open}
-          sx={{
-            width: open ? DRAWER_WIDTH : COLLAPSED_WIDTH,
-            flexShrink: 0,
-            transition: "width 0.3s",
-            "& .MuiDrawer-paper": {
-              width: open ? DRAWER_WIDTH : COLLAPSED_WIDTH,
-              overflowX: "hidden",
-              transition: "width 0.3s",
-              ...drawerPaperBase,
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
       )}
 
       <MainContent>
         <GlassAppBar position="sticky" elevation={0}>
-          <Toolbar>
+          <Toolbar sx={{ minHeight: 62 }}>
             {isMobile && (
               <IconButton
                 edge="start"
@@ -250,19 +327,54 @@ function AppLayout() {
                 <MenuIcon />
               </IconButton>
             )}
-            <PageTitle variant="h6">{currentItem.text}</PageTitle>
+            <PageTitle variant="h6" sx={{ fontSize: isMobile ? 18 : 20 }}>
+              {currentItem.text}
+            </PageTitle>
           </Toolbar>
         </GlassAppBar>
 
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route
-            path="/zawgyi-unicode-converter"
-            element={<ZawgyiUnicodeConverter />}
-          />
-          <Route path="/notes" element={<Notes />} />
-          <Route path="/dhamma" element={<Dhamma />} />
-        </Routes>
+        <RouteViewport>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/zawgyi-unicode-converter"
+              element={<ZawgyiUnicodeConverter />}
+            />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/dhamma" element={<Dhamma />} />
+          </Routes>
+        </RouteViewport>
+
+        {isMobile && (
+          <MobileBottomBar square elevation={0}>
+            <BottomNavigation
+              showLabels
+              value={currentItem.path}
+              onChange={(_, value: string) => handleNavClick(value)}
+              sx={{
+                height: BOTTOM_NAV_HEIGHT,
+                backgroundColor: "transparent",
+              }}
+            >
+              {menuItems.map((item) => (
+                <BottomNavigationAction
+                  key={item.path}
+                  value={item.path}
+                  label={item.text}
+                  icon={item.icon}
+                  sx={{
+                    minWidth: 62,
+                    color: "#a8a8a8",
+                    "&.Mui-selected": {
+                      color: "#b39ddb",
+                    },
+                  }}
+                />
+              ))}
+            </BottomNavigation>
+          </MobileBottomBar>
+        )}
+
         <PWABadge />
       </MainContent>
     </LayoutRoot>

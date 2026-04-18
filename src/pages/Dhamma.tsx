@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Box, Typography, Paper, Container, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -98,6 +98,15 @@ const SUTTAS = [
 
 export default function Dhamma() {
   const [fontSize, setFontSize] = useState(1.6);
+  const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
+
+  const handlePlay = useCallback((index: number) => {
+    audioRefs.current.forEach((el, i) => {
+      if (i !== index && el && !el.paused) {
+        el.pause();
+      }
+    });
+  }, []);
 
   const increase = () => setFontSize((s) => Math.min(s + 0.1, 2.0));
   const decrease = () => setFontSize((s) => Math.max(s - 0.1, 0.7));
@@ -145,10 +154,12 @@ export default function Dhamma() {
           </IconButton>
         </Box>
 
-        {SUTTAS.map((sutta) => (
+        {SUTTAS.map((sutta, index) => (
           <Box key={sutta.id} sx={{ mb: 4 }}>
             <Box
               component="audio"
+              ref={(el: HTMLAudioElement | null) => { audioRefs.current[index] = el; }}
+              onPlay={() => handlePlay(index)}
               controls
               src={sutta.audio}
               preload="none"

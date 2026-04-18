@@ -1,9 +1,24 @@
-import React, { useRef, useMemo, useCallback } from "react";
-import { Box, IconButton, Tab, Tabs, Tooltip } from "@mui/material";
+import React, { useRef, useMemo, useCallback, useEffect } from "react";
+import {
+  Box,
+  IconButton,
+  Tab,
+  Tabs,
+  Tooltip,
+  TextField,
+  Button,
+  Chip,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import { useNotesStore } from "../stores/useNotesStore";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudDoneIcon from "@mui/icons-material/CloudDone";
+import CloudOffIcon from "@mui/icons-material/CloudOff";
+import SaveIcon from "@mui/icons-material/Save";
+import ErrorIcon from "@mui/icons-material/Error";
+import SyncIcon from "@mui/icons-material/Sync";
+import { useNotesStore, type SyncStatus } from "../stores/useNotesStore";
 
 /* ── Styled Components ── */
 
@@ -57,6 +72,33 @@ const NewTabButton = styled(IconButton)({
   color: "#9e9e9e",
   "&:hover": { color: "#7c4dff" },
 });
+
+const SyncBar = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.75, 1.5),
+  borderBottom: "1px solid rgba(255,255,255,0.06)",
+  backgroundColor: "rgba(255,255,255,0.02)",
+  flexWrap: "wrap",
+}));
+
+function syncChipProps(status: SyncStatus, error: string | null) {
+  switch (status) {
+    case "synced":
+      return { label: "Synced to Cloud", color: "success" as const, icon: <CloudDoneIcon /> };
+    case "syncing":
+      return { label: "Syncing…", color: "info" as const, icon: <SyncIcon /> };
+    case "saved-locally":
+      return { label: "Saved Locally", color: "warning" as const, icon: <SaveIcon /> };
+    case "offline":
+      return { label: "Offline Mode", color: "default" as const, icon: <CloudOffIcon /> };
+    case "error":
+      return { label: error || "Sync Error", color: "error" as const, icon: <ErrorIcon /> };
+    default:
+      return { label: "Ready", color: "default" as const, icon: <CloudUploadIcon /> };
+  }
+}
 
 const EditorWrapper = styled(Box)(({ theme }) => ({
   flexGrow: 1,
@@ -116,12 +158,35 @@ export default function Notes() {
     setActiveTab,
     updateContent,
     renameTab,
+    password,
+    setPassword,
+    syncStatus,
+    syncError,
+    syncToCloud,
+    fetchFromCloud,
   } = useNotesStore();
 
   const activeTab = tabs.find((t) => t.id === activeId) || tabs[0];
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumRef = useRef<HTMLDivElement>(null);
+
+  // Fetch from cloud on initial mount
+  useEffect(() => {
+    fetchFromCloud();
+  }, [fetchFromCloud]);
+
+  // Listen for online/offline events
+  useEffect(() => {
+    const setOnline = () => useNotesStore.getState().setSyncStatus("saved-locally");
+    const setOffline = () => useNotesStore.getState().setSyncStatus("offline");
+    window.addEventListener("online", setOnline);
+    window.addEventListener("offline", setOffline);
+    return () => {
+      window.removeEventListener("online", setOnline);
+      window.removeEventListener("offline", setOffline);
+    };
+  }, []);
 
   const lineNumbers = useMemo(() => {
     const content = activeTab?.content || "";
@@ -188,6 +253,35 @@ export default function Notes() {
           </NewTabButton>
         </Tooltip>
       </TabBar>
+
+      <SyncBar>
+        <TextField
+          size="small"
+          type="password"
+          placeholder="Sync password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          sx={{
+            width: 150,
+            "& .MuiInputBase-root": { height: 32, fontSize: 13 },
+          }}
+        />
+        <Button
+          size="small"
+          variant="contained"
+          startIcon={<CloudUploadIcon />}
+          onClick={syncToCloud}
+          disabled={syncStatus === "syncing" || !password}
+          sx={{ textTransform: "none", height: 32, fontSize: 13 }}
+        >
+          Sync
+        </Button>
+        <Chip
+          size="small"
+          {...syncChipProps(syncStatus, syncError)}
+          sx={{ fontSize: 12 }}
+        />
+      </SyncBar>
 
       <EditorWrapper>
         <EditorContainer>

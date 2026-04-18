@@ -10,6 +10,14 @@ export default defineConfig({
   build: {
     outDir: "build",
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
@@ -25,7 +33,9 @@ export default defineConfig({
         name: "Tools",
         short_name: "Tools",
         description: "Tools",
+        display: "standalone",
         theme_color: "#3F50B5",
+        background_color: "#0f1117",
       },
 
       workbox: {

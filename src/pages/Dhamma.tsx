@@ -156,28 +156,11 @@ export default function Dhamma() {
 
         {SUTTAS.map((sutta, index) => (
           <Box key={sutta.id} sx={{ mb: 4 }}>
-            <Box
-              component="audio"
-              ref={(el: HTMLAudioElement | null) => { audioRefs.current[index] = el; }}
-              onPlay={() => handlePlay(index)}
-              controls
-              src={sutta.audio}
-              preload="none"
-              sx={{
-                width: "100%",
-                mb: 1,
-                borderRadius: 2,
-                outline: "none",
-                "&::-webkit-media-controls-panel": {
-                  backgroundColor: "rgba(255,255,255,0.06)",
-                },
-              }}
-            />
             <SuttaCard elevation={0}>
               <Typography
                 variant="h5"
                 sx={{
-                  mb: 3,
+                  mb: 2,
                   fontWeight: 700,
                   textAlign: "center",
                   color: "primary.light",
@@ -186,6 +169,23 @@ export default function Dhamma() {
               >
                 {sutta.title}ပါဠိတော်
               </Typography>
+              <Box
+                component="audio"
+                ref={(el: HTMLAudioElement | null) => { audioRefs.current[index] = el; }}
+                onPlay={() => handlePlay(index)}
+                controls
+                src={sutta.audio}
+                preload="none"
+                sx={{
+                  width: "100%",
+                  mb: 2,
+                  borderRadius: 2,
+                  outline: "none",
+                  "&::-webkit-media-controls-panel": {
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                  },
+                }}
+              />
               <Typography
                 variant="body1"
                 component="div"

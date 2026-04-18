@@ -120,7 +120,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
 export default function Dhamma() {
   const [value, setValue] = useState(0);
-  const [fontSize, setFontSize] = useState(1.1);
+  const [fontSize, setFontSize] = useState(1.4);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

@@ -13,6 +13,7 @@ import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import SaveIcon from "@mui/icons-material/Save";
@@ -164,6 +165,7 @@ export default function Notes() {
     syncError,
     syncToCloud,
     fetchFromCloud,
+    forceFetchFromCloud,
   } = useNotesStore();
 
   const activeTab = tabs.find((t) => t.id === activeId) || tabs[0];
@@ -274,7 +276,17 @@ export default function Notes() {
           disabled={syncStatus === "syncing" || !password}
           sx={{ textTransform: "none", height: 32, fontSize: 13 }}
         >
-          Sync
+          Push
+        </Button>
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<CloudDownloadIcon />}
+          onClick={forceFetchFromCloud}
+          disabled={syncStatus === "syncing"}
+          sx={{ textTransform: "none", height: 32, fontSize: 13 }}
+        >
+          Pull
         </Button>
         <Chip
           size="small"

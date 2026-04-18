@@ -40,6 +40,7 @@ interface NotesState {
   setSyncStatus: (status: SyncStatus, error?: string | null) => void;
   syncToCloud: () => Promise<void>;
   fetchFromCloud: () => Promise<void>;
+  forceFetchFromCloud: () => Promise<void>;
 }
 
 const defaultTab = createTab("Untitled 1");
@@ -181,6 +182,43 @@ export const useNotesStore = create<NotesState>()(
           }
         } catch {
           // Silently fail — offline-first means local data wins
+        }
+      },
+
+      forceFetchFromCloud: async () => {
+        if (!navigator.onLine) {
+          set({ syncStatus: "offline", syncError: null });
+          return;
+        }
+
+        set({ syncStatus: "syncing", syncError: null });
+        try {
+          const res = await fetch(API_BASE);
+          const json = await res.json();
+          if (!res.ok || !json.success || !json.data) {
+            set({ syncStatus: "error", syncError: "No data in cloud" });
+            return;
+          }
+
+          const remote =
+            typeof json.data === "string" ? JSON.parse(json.data) : json.data;
+          if (!remote.tabs || !Array.isArray(remote.tabs)) {
+            set({ syncStatus: "error", syncError: "Invalid cloud data" });
+            return;
+          }
+
+          set({
+            tabs: remote.tabs,
+            activeId: remote.activeId || remote.tabs[0]?.id,
+            lastModified: remote.lastModified || Date.now(),
+            syncStatus: "synced",
+            syncError: null,
+          });
+        } catch {
+          set({
+            syncStatus: navigator.onLine ? "error" : "offline",
+            syncError: navigator.onLine ? "Network error" : null,
+          });
         }
       },
     }),

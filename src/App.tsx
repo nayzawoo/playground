@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import PWABadge from "./PWABadge.tsx";
 import {
   AppBar,
@@ -38,10 +38,10 @@ import Dashboard from "./pages/Dashboard";
 import ZawgyiUnicodeConverter from "./pages/ZawgyiUnicodeConverter";
 import Notes from "./pages/Notes";
 import Dhamma from "./pages/Dhamma";
+import SwipeSidebar from "./components/SwipeSidebar";
 
 /* ── Constants ── */
 
-const DRAWER_WIDTH = 280;
 const RAIL_WIDTH = 96;
 const BOTTOM_NAV_HEIGHT = 74;
 const BORDER = "1px solid rgba(255,255,255,0.06)";
@@ -160,75 +160,63 @@ function AppLayout() {
   const currentItem =
     menuItems.find((item) => item.path === currentPath) || menuItems[0];
 
-  const handleNavClick = (path: string) => {
-    navigate(path);
-    setOpen(false);
-  };
+  const handleNavClick = useCallback(
+    (path: string) => {
+      navigate(path);
+      setOpen(false);
+    },
+    [navigate],
+  );
 
-  const drawerContent = (
-    <>
-      <Toolbar
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-        }}
-      >
-        <BrandTitle variant="h6" noWrap>
-          Tools
-        </BrandTitle>
-        <IconButton onClick={() => setOpen(false)} sx={{ color: "grey.400" }}>
-          <MenuIcon />
-        </IconButton>
-      </Toolbar>
+  const openSidebar = useCallback(() => setOpen(true), []);
+  const closeSidebar = useCallback(() => setOpen(false), []);
 
-      <SidebarDivider />
-
-      <NavList>
-        {menuItems.map((item) => {
-          const isSelected = currentPath === item.path;
-          return (
-            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                onClick={() => handleNavClick(item.path)}
+  const sidebarNavItems = (
+    <NavList sx={{ p: 0, m: 0 }}>
+      {menuItems.map((item) => {
+        const isSelected = currentPath === item.path;
+        return (
+          <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+            <ListItemButton
+              onClick={() => handleNavClick(item.path)}
+              sx={{
+                borderRadius: 2,
+                minHeight: 46,
+                justifyContent: "initial",
+                px: 2,
+                bgcolor: isSelected ? "rgba(124,77,255,0.12)" : "transparent",
+                color: isSelected ? "primary.main" : "grey.400",
+                "&:hover": {
+                  bgcolor: isSelected
+                    ? "rgba(124,77,255,0.18)"
+                    : "rgba(255,255,255,0.04)",
+                },
+                "&:active": { transform: "scale(0.96)" },
+                transition: "all 0.2s cubic-bezier(0.32, 2, 0.55, 0.27)",
+              }}
+            >
+              <ListItemIcon
                 sx={{
-                  borderRadius: 2,
-                  minHeight: 50,
-                  justifyContent: "initial",
-                  px: 2,
-                  bgcolor: isSelected ? "rgba(124,77,255,0.12)" : "transparent",
-                  color: isSelected ? "primary.main" : "grey.400",
-                  "&:hover": {
-                    bgcolor: isSelected
-                      ? "rgba(124,77,255,0.18)"
-                      : "rgba(255,255,255,0.04)",
-                  },
+                  minWidth: 0,
+                  mr: 2,
+                  justifyContent: "center",
+                  color: isSelected ? "primary.main" : "grey.500",
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: 2,
-                    justifyContent: "center",
-                    color: isSelected ? "primary.main" : "grey.500",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  primaryTypographyProps={{
-                    fontWeight: isSelected ? 600 : 400,
-                    fontSize: 14,
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </NavList>
-    </>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.text}
+                primaryTypographyProps={{
+                  fontWeight: isSelected ? 600 : 400,
+                  fontSize: 14,
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        );
+      })}
+    </NavList>
   );
 
   return (
@@ -302,17 +290,14 @@ function AppLayout() {
       )}
 
       {isMobile && (
-        <Drawer
-          variant="temporary"
+        <SwipeSidebar
           open={open}
-          onClose={() => setOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            "& .MuiDrawer-paper": { width: DRAWER_WIDTH, ...drawerPaperBase },
-          }}
+          onOpen={openSidebar}
+          onClose={closeSidebar}
+          enabled={isMobile}
         >
-          {drawerContent}
-        </Drawer>
+          {sidebarNavItems}
+        </SwipeSidebar>
       )}
 
       <MainContent>
@@ -321,7 +306,7 @@ function AppLayout() {
             {isMobile && (
               <IconButton
                 edge="start"
-                onClick={() => setOpen(true)}
+                onClick={openSidebar}
                 sx={{ mr: 1, color: "grey.400" }}
               >
                 <MenuIcon />

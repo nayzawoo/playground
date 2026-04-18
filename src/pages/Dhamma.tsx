@@ -110,18 +110,36 @@ export default function Dhamma() {
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            gap: 0.5,
+            gap: 1,
             mb: 1,
           }}
         >
-          <IconButton onClick={decrease} size="small" sx={{ color: "grey.400" }}>
-            <RemoveIcon fontSize="small" />
+          <IconButton
+            onClick={decrease}
+            sx={{
+              color: "grey.300",
+              width: 44,
+              height: 44,
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: 2,
+            }}
+          >
+            <RemoveIcon />
           </IconButton>
-          <Typography variant="caption" sx={{ color: "grey.500", minWidth: 20, textAlign: "center" }}>
+          <Typography variant="body1" sx={{ color: "grey.400", minWidth: 48, textAlign: "center", fontWeight: 600 }}>
             {Math.round(fontSize * 100)}%
           </Typography>
-          <IconButton onClick={increase} size="small" sx={{ color: "grey.400" }}>
-            <AddIcon fontSize="small" />
+          <IconButton
+            onClick={increase}
+            sx={{
+              color: "grey.300",
+              width: 44,
+              height: 44,
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: 2,
+            }}
+          >
+            <AddIcon />
           </IconButton>
         </Box>
 

@@ -175,8 +175,8 @@ export default function Notes() {
 
   // Fetch from cloud on initial mount
   useEffect(() => {
-    fetchFromCloud();
-  }, [fetchFromCloud]);
+    forceFetchFromCloud();
+  }, [forceFetchFromCloud]);
 
   // Listen for online/offline events
   useEffect(() => {

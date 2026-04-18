@@ -97,7 +97,7 @@ const SUTTAS = [
 /* ── Component ── */
 
 export default function Dhamma() {
-  const [fontSize, setFontSize] = useState(1.4);
+  const [fontSize, setFontSize] = useState(1.6);
 
   const increase = () => setFontSize((s) => Math.min(s + 0.1, 2.0));
   const decrease = () => setFontSize((s) => Math.max(s - 0.1, 0.7));
@@ -118,28 +118,30 @@ export default function Dhamma() {
             onClick={decrease}
             sx={{
               color: "grey.300",
-              width: 44,
-              height: 44,
+              width: 56,
+              height: 56,
               border: "1px solid rgba(255,255,255,0.12)",
               borderRadius: 2,
+              fontSize: 28,
             }}
           >
-            <RemoveIcon />
+            <RemoveIcon fontSize="inherit" />
           </IconButton>
-          <Typography variant="body1" sx={{ color: "grey.400", minWidth: 48, textAlign: "center", fontWeight: 600 }}>
+          <Typography variant="h6" sx={{ color: "grey.400", minWidth: 56, textAlign: "center", fontWeight: 700 }}>
             {Math.round(fontSize * 100)}%
           </Typography>
           <IconButton
             onClick={increase}
             sx={{
               color: "grey.300",
-              width: 44,
-              height: 44,
+              width: 56,
+              height: 56,
               border: "1px solid rgba(255,255,255,0.12)",
               borderRadius: 2,
+              fontSize: 28,
             }}
           >
-            <AddIcon />
+            <AddIcon fontSize="inherit" />
           </IconButton>
         </Box>
 

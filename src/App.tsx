@@ -39,6 +39,7 @@ import ZawgyiUnicodeConverter from "./pages/ZawgyiUnicodeConverter";
 import Notes from "./pages/Notes";
 import Dhamma from "./pages/Dhamma";
 import SwipeSidebar from "./components/SwipeSidebar";
+import { useBackButton } from "./hooks/useBackButton";
 
 /* ── Constants ── */
 
@@ -170,6 +171,9 @@ function AppLayout() {
 
   const openSidebar = useCallback(() => setOpen(true), []);
   const closeSidebar = useCallback(() => setOpen(false), []);
+
+  // Android back button closes sidebar instead of exiting PWA
+  useBackButton(open && isMobile, closeSidebar);
 
   const sidebarNavItems = (
     <NavList sx={{ p: 0, m: 0 }}>

@@ -16,16 +16,16 @@ if (!document.querySelector('link[href*="Padauk"]')) {
 
 const Root = styled(Box)(({ theme }) => ({
   flexGrow: 1,
-  padding: theme.spacing(2),
+  padding: theme.spacing(1),
   [theme.breakpoints.up("md")]: {
-    padding: theme.spacing(4),
+    padding: theme.spacing(2),
   },
 }));
 
 const MYANMAR_FONT = '"Padauk", "Pyidaungsu", "Myanmar Text", sans-serif';
 
 const SuttaCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: theme.spacing(1.5),
   backgroundColor: "rgba(255, 255, 255, 0.03)",
   border: "1px solid rgba(255, 255, 255, 0.06)",
   borderRadius: 16,

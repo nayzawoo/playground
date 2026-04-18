@@ -165,6 +165,7 @@ export default function Notes() {
     syncError,
     syncToCloud,
     forceFetchFromCloud,
+    fetchFromCloud,
   } = useNotesStore();
 
   const activeTab = tabs.find((t) => t.id === activeId) || tabs[0];
@@ -172,10 +173,10 @@ export default function Notes() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumRef = useRef<HTMLDivElement>(null);
 
-  // Fetch from cloud on initial mount
+  // Fetch from cloud on initial mount (only overwrite if remote is newer)
   useEffect(() => {
-    forceFetchFromCloud();
-  }, [forceFetchFromCloud]);
+    fetchFromCloud();
+  }, [fetchFromCloud]);
 
   // Listen for online/offline events
   useEffect(() => {

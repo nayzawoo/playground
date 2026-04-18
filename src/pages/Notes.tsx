@@ -164,7 +164,6 @@ export default function Notes() {
     syncStatus,
     syncError,
     syncToCloud,
-    fetchFromCloud,
     forceFetchFromCloud,
   } = useNotesStore();
 

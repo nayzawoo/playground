@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Typography, Tabs, Tab, Paper, Container, IconButton } from "@mui/material";
+import { useState } from "react";
+import { Box, Typography, Paper, Container, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -96,35 +96,8 @@ const SUTTAS = [
 
 /* ── Component ── */
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`sutta-tabpanel-${index}`}
-      aria-labelledby={`sutta-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
-    </div>
-  );
-}
-
 export default function Dhamma() {
-  const [value, setValue] = useState(0);
   const [fontSize, setFontSize] = useState(1.4);
-
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
 
   const increase = () => setFontSize((s) => Math.min(s + 0.1, 2.0));
   const decrease = () => setFontSize((s) => Math.max(s - 0.1, 0.7));
@@ -132,41 +105,28 @@ export default function Dhamma() {
   return (
     <Root>
       <Container maxWidth="md">
-        <Box sx={{ display: "flex", alignItems: "center", borderBottom: 1, borderColor: "rgba(255, 255, 255, 0.1)" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            variant="fullWidth"
-            textColor="primary"
-            indicatorColor="primary"
-            aria-label="Dhamma suttas tabs"
-            sx={{ flex: 1 }}
-          >
-            {SUTTAS.map((sutta, index) => (
-              <Tab
-                key={sutta.id}
-                label={sutta.title}
-                id={`sutta-tab-${index}`}
-                aria-controls={`sutta-tabpanel-${index}`}
-                sx={{ fontWeight: 700, fontFamily: MYANMAR_FONT }}
-              />
-            ))}
-          </Tabs>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: 0.5 }}>
-            <IconButton onClick={decrease} size="small" sx={{ color: "grey.400" }}>
-              <RemoveIcon fontSize="small" />
-            </IconButton>
-            <Typography variant="caption" sx={{ color: "grey.500", minWidth: 20, textAlign: "center" }}>
-              {Math.round(fontSize * 100)}%
-            </Typography>
-            <IconButton onClick={increase} size="small" sx={{ color: "grey.400" }}>
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 0.5,
+            mb: 1,
+          }}
+        >
+          <IconButton onClick={decrease} size="small" sx={{ color: "grey.400" }}>
+            <RemoveIcon fontSize="small" />
+          </IconButton>
+          <Typography variant="caption" sx={{ color: "grey.500", minWidth: 20, textAlign: "center" }}>
+            {Math.round(fontSize * 100)}%
+          </Typography>
+          <IconButton onClick={increase} size="small" sx={{ color: "grey.400" }}>
+            <AddIcon fontSize="small" />
+          </IconButton>
         </Box>
 
-        {SUTTAS.map((sutta, index) => (
-          <CustomTabPanel key={sutta.id} value={value} index={index}>
+        {SUTTAS.map((sutta) => (
+          <Box key={sutta.id} sx={{ mb: 4 }}>
             <Box
               component="audio"
               controls
@@ -174,7 +134,7 @@ export default function Dhamma() {
               preload="none"
               sx={{
                 width: "100%",
-                mt: 2,
+                mb: 1,
                 borderRadius: 2,
                 outline: "none",
                 "&::-webkit-media-controls-panel": {
@@ -222,7 +182,7 @@ export default function Dhamma() {
                 })}
               </Typography>
             </SuttaCard>
-          </CustomTabPanel>
+          </Box>
         ))}
       </Container>
     </Root>

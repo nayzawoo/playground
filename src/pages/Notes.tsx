@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useCallback, useEffect } from "react";
+import React, { useRef, useMemo, useCallback, useEffect, useState } from "react";
 import {
   Box,
   IconButton,
@@ -8,8 +8,14 @@ import {
   TextField,
   Button,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Paper,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { alpha, styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -30,12 +36,12 @@ const Root = styled(Box)({
   minHeight: 0,
 });
 
-const TabBar = styled(Box)({
+const TabBar = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  borderBottom: "1px solid rgba(255,255,255,0.06)",
-  backgroundColor: "rgba(255,255,255,0.02)",
-});
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: alpha(theme.palette.common.white, 0.02),
+}));
 
 const StyledTabs = styled(Tabs)({
   minHeight: 40,
@@ -60,27 +66,27 @@ const TabLabel = styled(Box)({
   gap: 4,
 });
 
-const CloseButton = styled(IconButton)({
+const CloseButton = styled(IconButton)(({ theme }) => ({
   padding: 2,
   fontSize: 14,
-  color: "#9e9e9e",
-  "&:hover": { color: "#e0e0e0" },
-});
+  color: theme.palette.text.secondary,
+  "&:hover": { color: theme.palette.text.primary },
+}));
 
-const NewTabButton = styled(IconButton)({
+const NewTabButton = styled(IconButton)(({ theme }) => ({
   marginLeft: 8,
   marginRight: 8,
-  color: "#9e9e9e",
-  "&:hover": { color: "#7c4dff" },
-});
+  color: theme.palette.text.secondary,
+  "&:hover": { color: theme.palette.primary.main },
+}));
 
 const SyncBar = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(1),
   padding: theme.spacing(0.75, 1.5),
-  borderBottom: "1px solid rgba(255,255,255,0.06)",
-  backgroundColor: "rgba(255,255,255,0.02)",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: alpha(theme.palette.common.white, 0.02),
   flexWrap: "wrap",
 }));
 
@@ -111,32 +117,32 @@ const EditorWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const EditorContainer = styled(Box)({
+const EditorContainer = styled(Paper)(({ theme }) => ({
   display: "flex",
-  border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: 4,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
   overflow: "hidden",
   width: "100%",
-});
+}));
 
-const LineNumbers = styled(Box)({
+const LineNumbers = styled(Box)(({ theme }) => ({
   padding: "16.5px 12px",
-  backgroundColor: "rgba(255,255,255,0.02)",
-  borderRight: "1px solid rgba(255,255,255,0.06)",
+  backgroundColor: alpha(theme.palette.common.white, 0.02),
+  borderRight: `1px solid ${theme.palette.divider}`,
   fontFamily: "'Menlo', 'Consolas', 'Monaco', monospace",
   fontSize: 14,
   lineHeight: 1.6,
-  color: "#757575",
+  color: theme.palette.text.disabled,
   textAlign: "right",
   userSelect: "none",
   overflow: "hidden",
   minWidth: 48,
-});
+}));
 
-const Textarea = styled("textarea")({
+const Textarea = styled("textarea")(({ theme }) => ({
   flex: 1,
   background: "transparent",
-  color: "#e0e0e0",
+  color: theme.palette.text.primary,
   border: "none",
   outline: "none",
   resize: "none",
@@ -146,7 +152,7 @@ const Textarea = styled("textarea")({
   lineHeight: 1.6,
   minHeight: 400,
   width: "100%",
-});
+}));
 
 /* ── Component ── */
 
@@ -169,6 +175,10 @@ export default function Notes() {
   } = useNotesStore();
 
   const activeTab = tabs.find((t) => t.id === activeId) || tabs[0];
+
+  const [closeTabId, setCloseTabId] = useState<string | null>(null);
+  const [renameTabId, setRenameTabId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineNumRef = useRef<HTMLDivElement>(null);
@@ -204,18 +214,27 @@ export default function Notes() {
 
   const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
     e.stopPropagation();
-    const confirmed = window.confirm("Close this tab?");
-    if (!confirmed) return;
-    closeTab(tabId);
+    setCloseTabId(tabId);
+  };
+
+  const confirmCloseTab = () => {
+    if (closeTabId) closeTab(closeTabId);
+    setCloseTabId(null);
   };
 
   const handleTitleDoubleClick = (tabId: string) => {
     const tab = tabs.find((t) => t.id === tabId);
     if (!tab) return;
-    const newTitle = prompt("Rename tab", tab.title);
-    if (newTitle && newTitle.trim()) {
-      renameTab(tabId, newTitle.trim());
+    setRenameTabId(tabId);
+    setRenameValue(tab.title);
+  };
+
+  const confirmRenameTab = () => {
+    if (renameTabId && renameValue.trim()) {
+      renameTab(renameTabId, renameValue.trim());
     }
+    setRenameTabId(null);
+    setRenameValue("");
   };
 
   return (
@@ -313,6 +332,54 @@ export default function Notes() {
           />
         </EditorContainer>
       </EditorWrapper>
+
+      <Dialog open={closeTabId !== null} onClose={() => setCloseTabId(null)}>
+        <DialogTitle>Close tab?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Unsaved changes in this tab will be lost.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCloseTabId(null)}>Cancel</Button>
+          <Button onClick={confirmCloseTab} color="error" variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={renameTabId !== null}
+        onClose={() => setRenameTabId(null)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Rename tab</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Tab name"
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") confirmRenameTab();
+            }}
+            size="medium"
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRenameTabId(null)}>Cancel</Button>
+          <Button
+            onClick={confirmRenameTab}
+            variant="contained"
+            disabled={!renameValue.trim()}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Root>
   );
 }

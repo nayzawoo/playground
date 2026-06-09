@@ -1,8 +1,16 @@
 import { useCallback, useRef, useState } from "react";
-import { Box, Typography, Paper, Container, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Container,
+  IconButton,
+  Stack,
+  Tooltip,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { PageContainer, SectionCard } from "../components/layout";
 
 /* ── Load Padauk font only for this page ── */
 const padaukLink = document.createElement("link");
@@ -14,22 +22,10 @@ if (!document.querySelector('link[href*="Padauk"]')) {
 
 /* ── Styled Components ── */
 
-const Root = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(1),
-  [theme.breakpoints.up("md")]: {
-    padding: theme.spacing(2),
-  },
-}));
-
 const MYANMAR_FONT = '"Padauk", "Pyidaungsu", "Myanmar Text", sans-serif';
 
-const SuttaCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(1.5),
-  backgroundColor: "rgba(255, 255, 255, 0.03)",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
-  borderRadius: 16,
-  marginTop: theme.spacing(3),
+const SuttaCard = styled(SectionCard)(({ theme }) => ({
+  marginTop: theme.spacing(2),
   lineHeight: 2.2,
   whiteSpace: "pre-wrap",
   fontFamily: MYANMAR_FONT,
@@ -112,51 +108,55 @@ export default function Dhamma() {
   const decrease = () => setFontSize((s) => Math.max(s - 0.1, 0.7));
 
   return (
-    <Root>
-      <Container maxWidth="md">
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            gap: 1,
-            mb: 1,
-          }}
+    <PageContainer>
+      <Container maxWidth="md" disableGutters>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-end"
+          spacing={1}
+          sx={{ mb: 1 }}
         >
-          <IconButton
-            onClick={decrease}
-            sx={{
-              color: "grey.300",
-              width: 56,
-              height: 56,
-              border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: 2,
-              fontSize: 28,
-            }}
+          <Tooltip title="Decrease font size">
+            <IconButton
+              onClick={decrease}
+              color="inherit"
+              sx={{
+                width: 48,
+                height: 48,
+                border: 1,
+                borderColor: "divider",
+              }}
+            >
+              <RemoveIcon />
+            </IconButton>
+          </Tooltip>
+          <Typography
+            variant="subtitle1"
+            color="text.secondary"
+            sx={{ minWidth: 56, textAlign: "center", fontWeight: 700 }}
           >
-            <RemoveIcon fontSize="inherit" />
-          </IconButton>
-          <Typography variant="h6" sx={{ color: "grey.400", minWidth: 56, textAlign: "center", fontWeight: 700 }}>
             {Math.round(fontSize * 100)}%
           </Typography>
-          <IconButton
-            onClick={increase}
-            sx={{
-              color: "grey.300",
-              width: 56,
-              height: 56,
-              border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: 2,
-              fontSize: 28,
-            }}
-          >
-            <AddIcon fontSize="inherit" />
-          </IconButton>
-        </Box>
+          <Tooltip title="Increase font size">
+            <IconButton
+              onClick={increase}
+              color="inherit"
+              sx={{
+                width: 48,
+                height: 48,
+                border: 1,
+                borderColor: "divider",
+              }}
+            >
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        </Stack>
 
         {SUTTAS.map((sutta, index) => (
           <Box key={sutta.id} sx={{ mb: 4 }}>
-            <SuttaCard elevation={0}>
+            <SuttaCard>
               <Typography
                 variant="h5"
                 sx={{
@@ -192,7 +192,7 @@ export default function Dhamma() {
                 sx={{
                   fontFamily: MYANMAR_FONT,
                   fontSize: `${fontSize}rem`,
-                  color: "#e0e0e0",
+                  color: "text.primary",
                 }}
               >
                 {sutta.content.split("\n").map((line, i) => {
@@ -216,6 +216,6 @@ export default function Dhamma() {
           </Box>
         ))}
       </Container>
-    </Root>
+    </PageContainer>
   );
 }

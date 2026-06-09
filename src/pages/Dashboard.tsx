@@ -112,6 +112,12 @@ export default function Dashboard() {
       hint: "Convert text",
       path: "/zawgyi-unicode-converter",
     },
+    {
+      label: "QR Code",
+      icon: <QrCode2Icon sx={{ fontSize: 20, color: "#ffb74d" }} />,
+      hint: "Generate code",
+      path: "/qr",
+    },
   ];
 
   return (

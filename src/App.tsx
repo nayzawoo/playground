@@ -33,11 +33,13 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import NoteIcon from "@mui/icons-material/Note";
 import BookIcon from "@mui/icons-material/Book";
+import QrCodeIcon from "@mui/icons-material/QrCode";
 
 import Dashboard from "./pages/Dashboard";
 import ZawgyiUnicodeConverter from "./pages/ZawgyiUnicodeConverter";
 import Notes from "./pages/Notes";
 import Dhamma from "./pages/Dhamma";
+import QRCodePage from "./pages/QRCode";
 import SwipeSidebar from "./components/SwipeSidebar";
 import { useBackButton } from "./hooks/useBackButton";
 
@@ -52,11 +54,52 @@ const BORDER = "1px solid rgba(255,255,255,0.06)";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
-    primary: { main: "#7c4dff" },
+    primary: { main: "#7c4dff", light: "#b39ddb", dark: "#5e35b1" },
+    secondary: { main: "#448aff" },
     background: { default: "#0f1117", paper: "#161923" },
+    divider: "rgba(255,255,255,0.08)",
   },
-  typography: { fontFamily: "'Inter', 'Roboto', sans-serif" },
+  typography: {
+    fontFamily: "'Roboto', 'Inter', sans-serif",
+    button: { textTransform: "none" },
+  },
   shape: { borderRadius: 16 },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: { borderRadius: 12, textTransform: "none" },
+      },
+    },
+    MuiPaper: {
+      defaultProps: { elevation: 0 },
+    },
+    MuiTextField: {
+      defaultProps: { variant: "outlined", size: "small" },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: { borderRadius: 12 },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 8 },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: { margin: 0 },
+        "#root": {
+          maxWidth: "none",
+          margin: 0,
+          padding: 0,
+          textAlign: "left",
+          minHeight: "100dvh",
+          width: "100%",
+        },
+      },
+    },
+  },
 });
 
 /* ── Menu Config ── */
@@ -65,6 +108,7 @@ const menuItems = [
   { text: "Dashboard", icon: <DashboardIcon />, path: "/" },
   { text: "Notes", icon: <NoteIcon />, path: "/notes" },
   { text: "Dhamma", icon: <BookIcon />, path: "/dhamma" },
+  { text: "QR", icon: <QrCodeIcon />, path: "/qr" },
   {
     text: "ZG-Uni",
     icon: <SwapHorizIcon />,
@@ -331,6 +375,7 @@ function AppLayout() {
             />
             <Route path="/notes" element={<Notes />} />
             <Route path="/dhamma" element={<Dhamma />} />
+            <Route path="/qr" element={<QRCodePage />} />
           </Routes>
         </RouteViewport>
 

@@ -77,15 +77,17 @@ export function useSwipeGesture({
       }
 
       currentX.current = touch.clientX;
-
-      if (!isOpen) {
-        // Opening gesture: clamp between 0 and drawerWidth
-        const translateX = Math.max(0, Math.min(dx, drawerWidth));
-        onDrag(translateX);
-      } else {
-        // Closing gesture: clamp between 0 and drawerWidth (left swipe)
-        const translateX = Math.max(0, drawerWidth + Math.min(0, dx));
-        onDrag(translateX);
+      
+      if (directionLocked.current === "horizontal") {
+        if (!isOpen) {
+          // Opening gesture: clamp between 0 and drawerWidth
+          const translateX = Math.max(0, Math.min(dx, drawerWidth));
+          onDrag(translateX);
+        } else {
+          // Closing gesture: clamp between 0 and drawerWidth (left swipe)
+          const translateX = Math.max(0, drawerWidth + Math.min(0, dx));
+          onDrag(translateX);
+        }
       }
     },
     [isOpen, drawerWidth, onDrag, onDragEnd],

@@ -10,6 +10,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:gh-pages": "DEPLOY_TARGET=gh-pages tsc -b && DEPLOY_TARGET=gh-pages vite build",
+    "generate:pwa-assets": "pwa-assets-generator --config pwa-assets.config.ts",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview"

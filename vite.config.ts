@@ -24,9 +24,10 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: false,
 
+      // Icons are generated once into public/ by `pnpm generate:pwa-assets`.
+      // Regenerating them through sharp on every build adds significant latency.
       pwaAssets: {
-        disabled: false,
-        config: true,
+        disabled: true,
       },
 
       manifest: {
@@ -36,6 +37,29 @@ export default defineConfig({
         display: "standalone",
         theme_color: "#0a0c12",
         background_color: "#0a0c12",
+        icons: [
+          {
+            src: "pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
+          },
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          {
+            src: "maskable-icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
       },
 
       workbox: {

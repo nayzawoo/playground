@@ -72,7 +72,7 @@ const theme = createTheme({
   },
   typography: {
     fontFamily:
-      "'Inter', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif",
+      "'Inter Variable', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif",
     h5: { fontWeight: 700, letterSpacing: -0.4 },
     h6: { fontWeight: 600, letterSpacing: -0.2 },
     subtitle1: { fontWeight: 600 },

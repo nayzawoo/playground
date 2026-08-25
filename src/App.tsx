@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import PWABadge from "./PWABadge.tsx";
 import {
   AppBar,
@@ -369,6 +369,12 @@ function AppLayout() {
 /* ── App Entry ── */
 
 export default function App() {
+  // Hand over from the inline splash only once React has committed, so the
+  // two never leave a blank frame between them.
+  useEffect(() => {
+    document.getElementById("splash")?.remove();
+  }, []);
+
   return (
     <ThemeProvider theme={theme} defaultMode="dark" noSsr>
       <CssBaseline />

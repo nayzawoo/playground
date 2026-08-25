@@ -11,14 +11,13 @@ import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { PageContainer, SectionCard } from "../components/layout";
+import { DHAMMA_AUDIO } from "../pwa/offlineAssets";
 
-/* ── Load Padauk font only for this page ── */
-const padaukLink = document.createElement("link");
-padaukLink.rel = "stylesheet";
-padaukLink.href = "https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap";
-if (!document.querySelector('link[href*="Padauk"]')) {
-  document.head.appendChild(padaukLink);
-}
+/* ── Padauk, self-hosted so the page renders offline ── */
+import "@fontsource/padauk/myanmar-400.css";
+import "@fontsource/padauk/myanmar-700.css";
+import "@fontsource/padauk/latin-400.css";
+import "@fontsource/padauk/latin-700.css";
 
 /* ── Styled Components ── */
 
@@ -43,7 +42,7 @@ const SUTTAS = [
   {
     id: "mangala",
     title: "မင်္ဂလသုတ်",
-    audio: "/dhamma/01MinGaLa-Thoat.mp3",
+    audio: DHAMMA_AUDIO.mangala,
     content: `၁။ ယံ မင်္ဂလံ ဒွါဒသဟိ၊ စိန္တယိံ သု သဒေဝကာ။ သောတ္ထာနံ နာဓိဂစ္ဆန္တိ၊ အဋ္ဌတ္တိံ သဉ္စမင်္ဂလံ။
 ၂။ ဒေသိတံ ဒေဝဒေဝေန၊ သဗ္ဗပါပဝိနာသနံ၊ သဗ္ဗလောက ဟိတတ္ထာယ၊ မင်္ဂလံ တံဘဏာမ ဟေ။
 ၃။ ဧဝံ မေသုတံ — ဧကံ သမယံ ဘဂဝါ သာဝတ္ထိယံ ဝိဟရတိ ဇေတဝနေ အနာထ ပိဏ္ဍိကဿ အာရာမေ။ အထ ခေါ အညတရာ ဒေဝတာ အဘိက္ကန္တာယ ရတ္တိယာ အဘိက္ကန္တ ဝဏ္ဏာ ကေဝလကပ္ပံ ဇေတဝနံ သြဘာသေတွာ ယေန ဘဂဝါ, တေနုပသင်္ကမိ။ ဥပသင်္ကမိတွာ ဘဂဝန္တံ အဘိဝါဒေတွာ ဧကမန္တံ အဋ္ဌာသိ။ ဧကမန္တံ ဌိတာ ခေါ သာ ဒေဝတာ ဘဂဝန္တံ ဂါထာယ အဇ္ဈဘာသိ။
@@ -63,7 +62,7 @@ const SUTTAS = [
   {
     id: "metta",
     title: "မေတ္တာသုတ်",
-    audio: "/dhamma/03Mitta-Thoat.mp3",
+    audio: DHAMMA_AUDIO.metta,
     content: `၁။ ယဿာနုဘာဝတော ယက္ခာ၊ နေဝ ဒဿေန္တိ ဘီသနံ။ ယဉှိ စေဝါ နုယုဉ္ဇန္တော၊ ရတ္တိန္ဒိဝ မတန္ဒိတော။
 ၂။ သုခံ သုပတိ သုတ္တော စ၊ ပါပံ ကိဉ္စိ န ပဿတိ။ ဧဝမာဒိ ဂုဏူပေတံ။ ပရိတ္တံ တံ ဘဏာမ ဟေ။
 ၃။ ကရဏီယ မတ္ထ ကုသလေန၊ ယန္တ သန္တံ ပဒံ အဘိသမေစ္စ။ သက္ကော ဥဇူ စ သုဟုဇူ စ၊ သုဝစော စဿ မုဒု အနတိမာနီ။
@@ -80,7 +79,7 @@ const SUTTAS = [
   {
     id: "mora",
     title: "မောရသုတ်",
-    audio: "/dhamma/05MawRa-Thoat.mp3",
+    audio: DHAMMA_AUDIO.mora,
     content: `၁။ ပူရေန္တံ ဗောဓိသမ္ဘာရေ၊ နိဗ္ဗတ္တံ မောရယောနိယံ။ ယေန သံဝိဟိတာ ရက္ခံ၊ မဟာသတ္တံ ဝနေစရာ။
 ၂။ စိရဿံ ဝါယမန္တာပိ၊ နေဝ သက္ခိံသု ဂဏှိတုံ။ ဗြဟ္မမန္တန္တိ အက္ခာတံ၊ ပရိတ္တံ တံ ဘဏာမ ဟေ။
 ၃။ ဥဒေတယံ စက္ခုမာ ဧကရာဇာ၊ ဟရိဿဝဏ္ဏော ပထဝိပ္ပဘာသော။ တံ တံ နမဿာမိ ဟရိဿဝဏ္ဏံ ပထဝိပ္ပဘာသံ၊ တယာဇ္ဇ ဂုတ္တာ ဝိဟရေမု ဒိဝသံ။

@@ -3,10 +3,14 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 const isGhPages = process.env.DEPLOY_TARGET === "gh-pages";
+const base = isGhPages ? "/playground/" : "/";
+
+/** Keep in sync with AUDIO_CACHE in src/pwa/offlineAssets.ts. */
+const AUDIO_CACHE = "audio-cache";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: isGhPages ? "/playground/" : "/",
+  base,
   build: {
     outDir: "build",
   },
@@ -31,10 +35,13 @@ export default defineConfig({
       },
 
       manifest: {
+        id: base,
         name: "Tools",
         short_name: "Tools",
         description: "Tools",
         display: "standalone",
+        start_url: base,
+        scope: base,
         theme_color: "#0a0c12",
         background_color: "#0a0c12",
         icons: [
@@ -63,7 +70,12 @@ export default defineConfig({
       },
 
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,ico,webp,jpg,jpeg,woff,woff2,ttf,webmanifest}"],
+        // The entire shell — scripts, styles, fonts and icons — is precached,
+        // so a cold launch never touches the network. There are no CDN
+        // resources; anything not precached is deliberately network-only.
+        globPatterns: [
+          "**/*.{js,css,html,svg,png,ico,webp,jpg,jpeg,woff,woff2,ttf,webmanifest}",
+        ],
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api\//],
@@ -72,41 +84,15 @@ export default defineConfig({
         clientsClaim: true,
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.mode === "navigate",
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "pages-cache",
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 7 * 24 * 60 * 60,
-              },
-            },
-          },
-          {
-            urlPattern: ({ request }) =>
-              request.destination === "script" ||
-              request.destination === "style" ||
-              request.destination === "worker",
-            handler: "StaleWhileRevalidate",
-            options: {
-              cacheName: "assets-cache",
-              expiration: {
-                maxEntries: 80,
-                maxAgeSeconds: 30 * 24 * 60 * 60,
-              },
-            },
-          },
-          {
-            urlPattern: ({ request }) =>
-              request.destination === "image" || request.destination === "font",
+            // Audio stays out of the precache: the precache strategy answers
+            // every request with a full 200, but Safari needs a 206 for media.
+            // rangeRequests slices the cached file to satisfy Range headers.
+            urlPattern: ({ request }) => request.destination === "audio",
             handler: "CacheFirst",
             options: {
-              cacheName: "media-cache",
-              expiration: {
-                maxEntries: 120,
-                maxAgeSeconds: 60 * 24 * 60 * 60,
-              },
+              cacheName: AUDIO_CACHE,
+              rangeRequests: true,
+              cacheableResponse: { statuses: [200] },
             },
           },
         ],

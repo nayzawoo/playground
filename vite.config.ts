@@ -34,8 +34,8 @@ export default defineConfig({
         short_name: "Tools",
         description: "Tools",
         display: "standalone",
-        theme_color: "#3F50B5",
-        background_color: "#0f1117",
+        theme_color: "#0a0c12",
+        background_color: "#0a0c12",
       },
 
       workbox: {

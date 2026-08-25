@@ -112,10 +112,8 @@ export default function Dhamma() {
       <Container maxWidth="md" disableGutters>
         <Stack
           direction="row"
-          alignItems="center"
-          justifyContent="flex-end"
           spacing={1}
-          sx={{ mb: 1 }}
+          sx={{ alignItems: "center", justifyContent: "flex-end", mb: 1 }}
         >
           <Tooltip title="Decrease font size">
             <IconButton
@@ -133,8 +131,12 @@ export default function Dhamma() {
           </Tooltip>
           <Typography
             variant="subtitle1"
-            color="text.secondary"
-            sx={{ minWidth: 56, textAlign: "center", fontWeight: 700 }}
+            sx={{
+              minWidth: 56,
+              textAlign: "center",
+              fontWeight: 700,
+              color: "text.secondary",
+            }}
           >
             {Math.round(fontSize * 100)}%
           </Typography>

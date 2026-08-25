@@ -1,20 +1,25 @@
 import { type ReactNode } from "react";
 import { Box, Button, Typography, Divider, SwipeableDrawer } from "@mui/material";
-import { styled, keyframes } from "@mui/material/styles";
+import {
+  alpha,
+  styled,
+  keyframes,
+  useTheme,
+  type Theme,
+} from "@mui/material/styles";
 import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import SyncIcon from "@mui/icons-material/Sync";
 import SaveIcon from "@mui/icons-material/Save";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useNotesStore, type SyncStatus } from "../stores/useNotesStore";
+import { tokens } from "../theme";
 
 /* ── Constants ── */
 
-const SIDEBAR_WIDTH = 280;
-const GLASS_BORDER = "1px solid rgba(255,255,255,0.12)";
-const GLASS_BLUR = "blur(30px)";
+const SIDEBAR_WIDTH = tokens.layout.sidebarWidth;
 
 /* ── Keyframes ── */
 
@@ -36,41 +41,41 @@ const BrandText = styled(Typography)({
   fontWeight: 700,
   fontSize: 20,
   letterSpacing: -0.5,
-  background: "linear-gradient(135deg, #b388ff, #7c4dff, #448aff)",
+  background: tokens.gradient.brand,
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
 });
 
-const GlassDivider = styled(Divider)({
-  borderColor: "rgba(255,255,255,0.08)",
+const GlassDivider = styled(Divider)(({ theme }) => ({
+  borderColor: theme.palette.divider,
   marginLeft: 16,
   marginRight: 16,
-});
+}));
 
 const SidebarSection = styled(Box)({
   padding: "12px 16px",
 });
 
-const SectionLabel = styled(Typography)({
+const SectionLabel = styled(Typography)(({ theme }) => ({
   fontSize: 11,
   fontWeight: 600,
   textTransform: "uppercase",
   letterSpacing: 0.8,
-  color: "rgba(255,255,255,0.3)",
+  color: theme.palette.text.disabled,
   marginBottom: 8,
-});
+}));
 
-const SidebarButton = styled(Button)({
+const SidebarButton = styled(Button)(({ theme }) => ({
   justifyContent: "flex-start",
   gap: 10,
   height: 46,
   paddingLeft: 14,
   paddingRight: 14,
-  color: "rgba(255,255,255,0.8)",
-  borderColor: "rgba(255,255,255,0.08)",
-  backgroundColor: "rgba(255,255,255,0.04)",
+  color: theme.palette.text.primary,
+  borderColor: theme.palette.divider,
+  backgroundColor: alpha("#ffffff", 0.04),
   "&:active": { transform: "scale(0.98)" },
-});
+}));
 
 const StatusRow = styled(Box)({
   display: "flex",
@@ -78,8 +83,8 @@ const StatusRow = styled(Box)({
   gap: 8,
   padding: "10px 14px",
   borderRadius: 12,
-  backgroundColor: "rgba(255,255,255,0.03)",
-  border: "1px solid rgba(255,255,255,0.06)",
+  backgroundColor: alpha("#ffffff", 0.03),
+  border: tokens.border.subtle,
 });
 
 const StatusDot = styled("span")<{ color: string }>(({ color }) => ({
@@ -94,20 +99,26 @@ const StatusDot = styled("span")<{ color: string }>(({ color }) => ({
 
 /* ── Helpers ── */
 
-function syncInfo(status: SyncStatus, error: string | null) {
+type SyncPalette = Theme["palette"];
+
+function syncInfo(
+  status: SyncStatus,
+  error: string | null,
+  palette: SyncPalette,
+) {
   switch (status) {
     case "synced":
-      return { label: "Synced to Cloud", color: "#4caf50", icon: <CloudDoneIcon sx={{ fontSize: 16, color: "#4caf50" }} /> };
+      return { label: "Synced to Cloud", color: palette.success.main, Icon: CloudDoneIcon };
     case "syncing":
-      return { label: "Syncing…", color: "#7c4dff", icon: <SyncIcon sx={{ fontSize: 16, color: "#7c4dff", animation: `${pulseGlow} 1.2s ease-in-out infinite` }} /> };
+      return { label: "Syncing…", color: palette.primary.main, Icon: SyncIcon, pulse: true };
     case "saved-locally":
-      return { label: "Saved Locally", color: "#ff9800", icon: <SaveIcon sx={{ fontSize: 16, color: "#ff9800" }} /> };
+      return { label: "Saved Locally", color: palette.warning.main, Icon: SaveIcon };
     case "offline":
-      return { label: "Offline Mode", color: "#78909c", icon: <CloudOffIcon sx={{ fontSize: 16, color: "#78909c" }} /> };
+      return { label: "Offline Mode", color: palette.text.disabled, Icon: CloudOffIcon };
     case "error":
-      return { label: error || "Sync Error", color: "#ef5350", icon: <ErrorOutlineIcon sx={{ fontSize: 16, color: "#ef5350" }} /> };
+      return { label: error || "Sync Error", color: palette.error.main, Icon: ErrorOutlinedIcon };
     default:
-      return { label: "Ready", color: "#78909c", icon: <CloudDoneIcon sx={{ fontSize: 16, color: "#78909c" }} /> };
+      return { label: "Ready", color: palette.text.disabled, Icon: CloudDoneIcon };
   }
 }
 
@@ -131,7 +142,8 @@ export default function SwipeSidebar({
   enabled = true,
 }: SwipeSidebarProps) {
   const { addTab, syncStatus, syncError } = useNotesStore();
-  const sInfo = syncInfo(syncStatus, syncError);
+  const { palette } = useTheme();
+  const sInfo = syncInfo(syncStatus, syncError, palette);
 
   return (
     <SwipeableDrawer
@@ -141,20 +153,22 @@ export default function SwipeSidebar({
       onOpen={onOpen}
       disableDiscovery={false}
       disableSwipeToOpen={!enabled}
-      PaperProps={{
-        sx: {
-          width: SIDEBAR_WIDTH,
-          backgroundColor: "rgba(18, 18, 28, 0.88)",
-          backdropFilter: GLASS_BLUR,
-          WebkitBackdropFilter: GLASS_BLUR,
-          borderRight: GLASS_BORDER,
-          display: "flex",
-          flexDirection: "column",
-          overflowX: "hidden",
-          "&::-webkit-scrollbar": { display: "none" },
-          scrollbarWidth: "none",
-          boxSizing: "border-box",
-        }
+      slotProps={{
+        paper: {
+          sx: {
+            width: SIDEBAR_WIDTH,
+            backgroundColor: tokens.glass.sidebar,
+            backdropFilter: tokens.glass.blur,
+            WebkitBackdropFilter: tokens.glass.blur,
+            borderRight: tokens.border.default,
+            display: "flex",
+            flexDirection: "column",
+            overflowX: "hidden",
+            "&::-webkit-scrollbar": { display: "none" },
+            scrollbarWidth: "none",
+            boxSizing: "border-box",
+          },
+        },
       }}
     >
       <SidebarHeader>
@@ -167,15 +181,17 @@ export default function SwipeSidebar({
       <SidebarSection>
         <SectionLabel>Sync Status</SectionLabel>
         <StatusRow>
-          {sInfo.icon}
-          <StatusDot color={sInfo.color} />
-          <Typography
+          <sInfo.Icon
             sx={{
-              fontSize: 13,
-              color: "rgba(255,255,255,0.65)",
-              flex: 1,
+              fontSize: 16,
+              color: sInfo.color,
+              ...(sInfo.pulse && {
+                animation: `${pulseGlow} 1.2s ease-in-out infinite`,
+              }),
             }}
-          >
+          />
+          <StatusDot color={sInfo.color} />
+          <Typography sx={{ fontSize: 13, color: "text.secondary", flex: 1 }}>
             {sInfo.label}
           </Typography>
         </StatusRow>
@@ -194,7 +210,9 @@ export default function SwipeSidebar({
               addTab();
               onClose();
             }}
-            startIcon={<NoteAddIcon sx={{ fontSize: 18, color: "#b388ff" }} />}
+            startIcon={
+              <NoteAddIcon sx={{ fontSize: 18, color: "primary.light" }} />
+            }
           >
             New Note
           </SidebarButton>
@@ -221,7 +239,7 @@ export default function SwipeSidebar({
           variant="outlined"
           onClick={() => { /* placeholder for settings */ }}
           startIcon={
-            <SettingsIcon sx={{ fontSize: 18, color: "rgba(255,255,255,0.45)" }} />
+            <SettingsIcon sx={{ fontSize: 18, color: "text.disabled" }} />
           }
         >
           Settings

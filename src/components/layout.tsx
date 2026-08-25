@@ -1,5 +1,6 @@
 import { Box, Paper } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";
+import { tokens } from "../theme";
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   flexGrow: 1,
@@ -18,5 +19,5 @@ export const SectionCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.background.paper, 0.85),
-  border: `1px solid ${alpha(theme.palette.common.white, 0.08)}`,
+  border: tokens.border.default,
 }));

@@ -13,7 +13,7 @@ export default function QRCodePage() {
 
   return (
     <PageContainer>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "text.secondary" }}>
         Enter text or a URL to generate a QR code.
       </Typography>
 

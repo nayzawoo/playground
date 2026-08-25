@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-// import "./index.css";
 import App from "./App.tsx";
 
 // Prevent pinch-to-zoom on iOS (Safari ignores viewport meta since iOS 10)

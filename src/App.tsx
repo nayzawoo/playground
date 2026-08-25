@@ -20,14 +20,14 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
+import { alpha, styled, ThemeProvider } from "@mui/material/styles";
 import {
   HashRouter,
   Routes,
   Route,
   useNavigate,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
@@ -42,65 +42,12 @@ import Dhamma from "./pages/Dhamma";
 import QRCodePage from "./pages/QRCode";
 import SwipeSidebar from "./components/SwipeSidebar";
 import { useBackButton } from "./hooks/useBackButton";
+import theme, { tokens } from "./theme";
 
 /* ── Constants ── */
 
-const RAIL_WIDTH = 96;
-const BOTTOM_NAV_HEIGHT = 74;
-const BORDER = "1px solid rgba(255,255,255,0.06)";
-
-/* ── Theme ── */
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: { main: "#7c4dff", light: "#b39ddb", dark: "#5e35b1" },
-    secondary: { main: "#448aff" },
-    background: { default: "#0f1117", paper: "#161923" },
-    divider: "rgba(255,255,255,0.08)",
-  },
-  typography: {
-    fontFamily: "'Roboto', 'Inter', sans-serif",
-    button: { textTransform: "none" },
-  },
-  shape: { borderRadius: 16 },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: { borderRadius: 12, textTransform: "none" },
-      },
-    },
-    MuiPaper: {
-      defaultProps: { elevation: 0 },
-    },
-    MuiTextField: {
-      defaultProps: { variant: "outlined", size: "small" },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: { borderRadius: 12 },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: { borderRadius: 8 },
-      },
-    },
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: { margin: 0 },
-        "#root": {
-          maxWidth: "none",
-          margin: 0,
-          padding: 0,
-          textAlign: "left",
-          minHeight: "100dvh",
-          width: "100%",
-        },
-      },
-    },
-  },
-});
+const { railWidth: RAIL_WIDTH, bottomNavHeight: BOTTOM_NAV_HEIGHT } =
+  tokens.layout;
 
 /* ── Menu Config ── */
 
@@ -118,22 +65,23 @@ const menuItems = [
 
 /* ── Styled Components ── */
 
-const LayoutRoot = styled(Box)({
+const LayoutRoot = styled(Box)(({ theme }) => ({
   display: "flex",
   minHeight: "100dvh",
-  background:
-    "radial-gradient(circle at 5% 0%, rgba(124,77,255,0.12), transparent 34%), #0f1117",
-});
+  backgroundColor: theme.palette.background.default,
+  backgroundImage: tokens.gradient.shell,
+}));
 
 const BrandTitle = styled(Typography)({
   fontWeight: 700,
-  background: "linear-gradient(90deg, #7c4dff, #448aff)",
+  letterSpacing: -0.3,
+  background: tokens.gradient.brand,
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
 });
 
 const SidebarDivider = styled(Divider)({
-  borderColor: "rgba(255,255,255,0.06)",
+  borderColor: alpha("#ffffff", 0.06),
 });
 
 const NavList = styled(List)({
@@ -144,13 +92,15 @@ const NavList = styled(List)({
 
 const drawerPaperBase = {
   bgcolor: "background.paper",
-  borderRight: BORDER,
+  borderRight: tokens.border.subtle,
 } as const;
 
 const GlassAppBar = styled(AppBar)({
-  backgroundColor: "rgba(15, 17, 23, 0.72)",
-  backdropFilter: "blur(14px)",
-  borderBottom: BORDER,
+  backgroundColor: tokens.glass.appBar,
+  backdropFilter: tokens.glass.blur,
+  WebkitBackdropFilter: tokens.glass.blur,
+  borderBottom: tokens.border.subtle,
+  backgroundImage: "none",
 });
 
 const MainContent = styled("main")(({ theme }) => ({
@@ -181,15 +131,30 @@ const MobileBottomBar = styled(Paper)(({ theme }) => ({
   right: 0,
   bottom: 0,
   zIndex: theme.zIndex.appBar,
-  borderTop: BORDER,
-  backgroundColor: "rgba(22, 25, 35, 0.95)",
-  backdropFilter: "blur(12px)",
+  borderTop: tokens.border.subtle,
+  backgroundColor: tokens.glass.bottomBar,
+  backdropFilter: tokens.glass.blur,
+  WebkitBackdropFilter: tokens.glass.blur,
   paddingBottom: "env(safe-area-inset-bottom, 0px)",
 }));
 
 const PageTitle = styled(Typography)({
   fontWeight: 600,
   letterSpacing: 0.2,
+});
+
+/** Shared appearance for nav entries in both the desktop rail and the drawer. */
+const navItemSx = (isSelected: boolean) => ({
+  borderRadius: 2,
+  color: isSelected ? "primary.main" : "text.secondary",
+  bgcolor: isSelected ? alpha(tokens.accent.violet, 0.14) : "transparent",
+  "&:hover": {
+    bgcolor: isSelected
+      ? alpha(tokens.accent.violet, 0.2)
+      : alpha("#ffffff", 0.04),
+  },
+  "&:active": { transform: "scale(0.97)" },
+  transition: "background-color 0.18s ease, transform 0.18s ease",
 });
 
 /* ── Layout ── */
@@ -228,19 +193,10 @@ function AppLayout() {
             <ListItemButton
               onClick={() => handleNavClick(item.path)}
               sx={{
-                borderRadius: 2,
+                ...navItemSx(isSelected),
                 minHeight: 46,
                 justifyContent: "initial",
                 px: 2,
-                bgcolor: isSelected ? "rgba(124,77,255,0.12)" : "transparent",
-                color: isSelected ? "primary.main" : "grey.400",
-                "&:hover": {
-                  bgcolor: isSelected
-                    ? "rgba(124,77,255,0.18)"
-                    : "rgba(255,255,255,0.04)",
-                },
-                "&:active": { transform: "scale(0.96)" },
-                transition: "all 0.2s cubic-bezier(0.32, 2, 0.55, 0.27)",
               }}
             >
               <ListItemIcon
@@ -248,16 +204,20 @@ function AppLayout() {
                   minWidth: 0,
                   mr: 2,
                   justifyContent: "center",
-                  color: isSelected ? "primary.main" : "grey.500",
+                  color: "inherit",
                 }}
               >
                 {item.icon}
               </ListItemIcon>
               <ListItemText
                 primary={item.text}
-                primaryTypographyProps={{
-                  fontWeight: isSelected ? 600 : 400,
-                  fontSize: 14,
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontWeight: isSelected ? 600 : 400,
+                      fontSize: 14,
+                    },
+                  },
                 }}
               />
             </ListItemButton>
@@ -300,28 +260,19 @@ function AppLayout() {
                   <ListItemButton
                     onClick={() => handleNavClick(item.path)}
                     sx={{
-                      borderRadius: 2,
+                      ...navItemSx(isSelected),
                       minHeight: 56,
                       px: 1,
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 0.5,
-                      bgcolor: isSelected
-                        ? "rgba(124,77,255,0.16)"
-                        : "transparent",
-                      color: isSelected ? "primary.main" : "grey.400",
-                      "&:hover": {
-                        bgcolor: isSelected
-                          ? "rgba(124,77,255,0.24)"
-                          : "rgba(255,255,255,0.04)",
-                      },
                     }}
                   >
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        color: isSelected ? "primary.main" : "grey.500",
+                        color: "inherit",
                       }}
                     >
                       {item.icon}
@@ -355,7 +306,7 @@ function AppLayout() {
               <IconButton
                 edge="start"
                 onClick={openSidebar}
-                sx={{ mr: 1, color: "grey.400" }}
+                sx={{ mr: 1, color: "text.secondary" }}
               >
                 <MenuIcon />
               </IconButton>
@@ -398,9 +349,9 @@ function AppLayout() {
                   icon={item.icon}
                   sx={{
                     minWidth: 62,
-                    color: "#a8a8a8",
+                    color: "text.secondary",
                     "&.Mui-selected": {
-                      color: "#b39ddb",
+                      color: "primary.light",
                     },
                   }}
                 />
@@ -419,7 +370,7 @@ function AppLayout() {
 
 export default function App() {
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme} defaultMode="dark" noSsr>
       <CssBaseline />
       <HashRouter>
         <AppLayout />

@@ -19,9 +19,9 @@ import { useEffect, useRef } from "react";
  *
  * ### Stale-closure safety
  * Both the push/pop logic and the popstate handler share a single
- * `isActiveRef` that is kept in sync with the `isActive` prop every
- * render.  This avoids the classic React stale-closure pitfall where
- * a popstate handler captures an old value of `isOpen`.
+ * `isActiveRef` that is synced after every commit.  This avoids the
+ * classic React stale-closure pitfall where a popstate handler captures
+ * an old value of `isOpen`.
  *
  * ### iOS compatibility
  * This hook only manipulates `history.pushState` / `history.back()`.
@@ -40,9 +40,12 @@ export function useBackButton(isActive: boolean, onClose: () => void) {
   const pushedRef = useRef(false); // did WE push a sentinel?
   const handlingPopRef = useRef(false); // are we inside the popstate callback?
 
-  // Keep refs fresh on every render (safe – refs don't cause re-renders).
-  isActiveRef.current = isActive;
-  onCloseRef.current = onClose;
+  // Sync after every commit rather than during render; popstate only fires
+  // from user interaction, which is always after the commit has flushed.
+  useEffect(() => {
+    isActiveRef.current = isActive;
+    onCloseRef.current = onClose;
+  });
 
   // ── Push / pop sentinel when overlay opens / closes ──────────────
   useEffect(() => {
@@ -60,7 +63,7 @@ export function useBackButton(isActive: boolean, onClose: () => void) {
 
   // ── Listen for hardware back button ──────────────────────────────
   useEffect(() => {
-    const handlePopState = (_e: PopStateEvent) => {
+    const handlePopState = () => {
       if (isActiveRef.current && pushedRef.current) {
         // The browser already popped our sentinel entry.
         // Just close the overlay; don't call history.back() again.

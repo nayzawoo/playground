@@ -5,8 +5,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import zawgyiFont from "../assets/fonts/zawgyi.ttf";
 import { PageContainer, SectionCard } from "../components/layout";
-// @ts-ignore
-import { zg2uni, uni2zg } from "/src/Libs/Rabbit";
+import { zg2uni, uni2zg } from "../Libs/Rabbit";
 
 const FieldsRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -67,11 +66,11 @@ export default function ZawgyiUnicodeConverter() {
 
   return (
     <PageContainer>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "text.secondary" }}>
         Convert Myanmar text between Zawgyi and Unicode encodings.
       </Typography>
 
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
         <Button
           variant="outlined"
           size="small"

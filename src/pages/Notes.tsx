@@ -242,7 +242,7 @@ export default function Notes() {
       <TabBar>
         <StyledTabs
           value={activeId}
-          onChange={(_: any, v: string) => setActiveTab(v)}
+          onChange={(_: React.SyntheticEvent, v: string) => setActiveTab(v)}
           variant="scrollable"
           scrollButtons="auto"
         >
